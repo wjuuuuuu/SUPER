@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<!-- 수민 -->
+		<typeAlias alias="calendar" type="superPms.vo.Calendar"/>
+		<typeAlias alias="todolist" type="superPms.vo.Todolist"/>
+		<typeAlias alias="mailfile" type="superPms.vo.MailFile"/>
+      	<typeAlias alias="mail" type="superPms.vo.Mail"/>
+      	<typeAlias alias="mailsch" type="superPms.vo.MailSch"/>
+      	<typeAlias alias="alert" type="superPms.vo.Alert"/> 
+		<!-- 은빈 -->
+		<typeAlias alias="superdept" type="superPms.vo.SuperDept"/>
+      	<typeAlias alias="deptsch" type="superPms.vo.DeptSch"/>
+      	<typeAlias alias="superempdept" type="superPms.vo.SuperEmpDept"/>
+      	<typeAlias alias="deptcode" type="superPms.vo.DeptCode"/>
+      	<typeAlias alias="authcode" type="superPms.vo.AuthCode"/>
+      	<typeAlias alias="passmail" type="superPms.vo.PassMail"/>
+      	<!-- 종은 -->
+      	<typeAlias alias="work" type="superPms.vo.Work"/>
+      	<typeAlias alias="worksch" type="superPms.vo.WorkSch"/>
+      	<typeAlias alias="workfile" type="superPms.vo.WorkFile"/>
+      	<typeAlias alias="workrep" type="superPms.vo.WorkRep"/>
+      	<typeAlias alias="ganttsch" type="superPms.vo.GanttSch"/>
+      	<typeAlias alias="workmem" type="superPms.vo.WorkMember"/>
+      	<typeAlias alias="prjowner" type="superPms.vo.PrjOwner"/>
+      	<!-- /종은 -->
+      	
+      	<typeAlias alias="risk" type="superPms.vo.Risk"/>
+      	<typeAlias alias="risksch" type="superPms.vo.RiskSch"/>
+      	<typeAlias alias="solution" type="superPms.vo.Solution"/>
+      	<typeAlias alias="solutionsch" type="superPms.vo.SolutionSch"/>
+      	<typeAlias alias="strategy" type="superPms.vo.Strategy"/>
+      	<typeAlias alias="strategycare" type="superPms.vo.Strategycare"/>
+      	<typeAlias alias="strategycaresch" type="superPms.vo.StrategycareSch"/>
+      	
+      	<!-- 민우 -->	
+      	<typeAlias alias="notice" type="superPms.vo.Notice"/>
+      	<typeAlias alias="noticesch" type="superPms.vo.NoticeSch"/>
+      	<typeAlias alias="noticerep" type="superPms.vo.NoticeRep"/>
+      	<typeAlias alias="noticerepsch" type="superPms.vo.NoticeRepSch"/>
+      	<typeAlias alias="drive" type="superPms.vo.Drive"/>
+      	<!--  -->
+      	
+      	<!-- 원주 -->
+      	<typeAlias alias="project" type="superPms.vo.Project"/>
+		<typeAlias alias="projectsch" type="superPms.vo.ProjectSch"/>
+		<typeAlias alias="projectMember" type="superPms.vo.ProjectMember"/>
+		<typeAlias alias="pmList" type="superPms.vo.ProjectMemberList"/>
+      	<typeAlias alias="gantt" type="superPms.vo.Gantt"/>
+      	<typeAlias alias="link" type="superPms.vo.Link"/>
+      	<typeAlias alias="bar" type="superPms.vo.BarChart"/>
+      	<typeAlias alias="donut" type="superPms.vo.DonutChart"/>
+      	<typeAlias alias="superempdeptsch" type="superPms.vo.SuperEmpDeptSch"/>
+      	<!-- /원주 -->
+	</typeAliases>
+
+	<mappers>
+		<mapper resource="resource/sumin/CalendarMapper.xml"/>
+		<mapper resource="resource/sumin/TodolistMapper.xml"/>
+		<mapper resource="resource/sumin/AlertMapper.xml"/>
+		<mapper resource="resource/sumin/MailMapper.xml"/>
+		<mapper resource="resource/wonju/ProjectMapper.xml"/>
+		<mapper resource="resource/wonju/GanttMapper.xml"/>
+		<mapper resource="resource/wonju/ChartMapper.xml"/>
+		<mapper resource="resource/eunbeen/DeptMapper.xml"/>
+		<mapper resource="resource/eunbeen/EmpMapper.xml"/>
+		<mapper resource="resource/jungwoo/RiskMapper.xml"/>
+		<mapper resource="resource/jungwoo/SolutionMapper.xml"/>
+		<mapper resource="resource/jongeun/WorkMapper.xml"/>		
+		<mapper resource="resource/minwoo/NoticeMapper.xml"/>	
+		<mapper resource="resource/minwoo/DriveMapper.xml"/>	
+	</mappers>
+</configuration>

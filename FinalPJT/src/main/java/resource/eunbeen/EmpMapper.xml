@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+
+<mapper namespace="superPms.dao.SuperEmp_Dao">
+	<select id="getEmpList" resultType="SuperEmpDept" parameterType="SuperEmpDept">
+		select e.id, e.ename, e.cell, e.deptid, d.dname, to_char(e.hiredate,'YYYY-MM-DD') hiredate, e.job
+		from emp e, dept d
+		where e.deptid = d.deptid
+		AND e.ename like '%'||#{sename}||'%'
+		and d.dname like '%'||#{dname}||'%'
+		AND e.job like '%'||#{job}||'%'
+		and d.dname NOT LIKE '최고경영진'
+		ORDER BY d.dname
+	</select>
+	<select id="getEmpListPage" resultType="SuperEmpDept" parameterType="superempdeptsch">
+		select * from (select rownum rm, e.id, e.ename, e.cell, e.deptid, d.dname, to_char(e.hiredate,'YYYY-MM-DD') hiredate, e.job
+						from emp e, dept d
+						where 1=1
+						and e.deptid = d.deptid
+						AND e.ename like '%'||#{sename}||'%'
+						and d.dname like '%'||#{dname}||'%'
+						AND e.job like '%'||#{job}||'%'
+						and d.dname NOT LIKE '최고경영진'
+						ORDER BY d.dname)
+		where rm between #{start} and #{end}
+	</select>
+	<select id="empTot" resultType="int" parameterType="superempdeptsch">
+		SELECT count(*) 
+		FROM emp e, dept d
+		WHERE 1=1
+		and e.deptid = d.deptid
+		and ename NOT LIKE '이회장'	
+		AND e.ename like '%'||#{sename}||'%'
+		and d.dname like '%'||#{dname}||'%'
+		AND e.job like '%'||#{job}||'%'
+		
+	</select>
+	<select id="idChk" resultType="superempdept" parameterType="String">
+		SELECT * 
+		FROM emp
+		WHERE id=#{id}
+	</select>
+	<select id="cellChk" resultType="superempdept" parameterType="String">
+		SELECT * 
+		FROM emp
+		WHERE cell=#{cell}
+	</select>
+	<select id="getParentDeptComb" resultType="deptcode">
+      	SELECT DISTINCT d.deptid key, d.dname val
+		FROM dept d
+		WHERE parentDept IS NULL
+		AND dname NOT LIKE '최고경영진'          
+   </select>
+	<insert id="insertEmp" parameterType="superempdept">	
+		INSERT INTO emp
+		values(#{id}, #{pass}, #{ename}, #{cell}, 4, #{deptid}, sysdate, '사원')		
+	</insert>
+	<delete id="deleteEmp" parameterType="String">
+		DELETE FROM emp WHERE id=#{id}
+	</delete>
+	<select id="getAuthSetting" resultType="superempdept" parameterType="String">
+		SELECT e.ename, e.id, e.auth, e.job, d.dname, e.cell
+		FROM emp e, dept d
+		WHERE e.deptid = d.deptid
+		AND e.id = #{id}			
+	</select>
+	<select id="getJobCom" resultType="string">
+		SELECT DISTINCT job
+		FROM emp
+		WHERE job NOT LIKE 'ceo'
+	</select>
+	<select id="getAuthComb" resultType="authcode">
+      	SELECT DISTINCT d.deptid key, d.dname val
+		FROM dept d
+		WHERE parentDept IS NULL
+		AND dname NOT LIKE '최고경영진'          
+   </select>
+   <select id="getAuthCom" resultType="string">
+   		SELECT DISTINCT auth
+		FROM emp
+		WHERE auth NOT LIKE 1
+   </select>
+   <update id="uptEmp"  parameterType="superempdept">
+		update emp
+			set auth=#{auth},
+				job=#{job}
+			where id = #{id}
+	</update>
+	<select id="login" resultType="superempdept">
+		SELECT *
+		FROM emp 
+		where id = #{id} AND pass = #{pass}
+	</select>
+	<update id="updateMyInfo"  parameterType="superempdept">
+		update emp
+			set pass=#{newPass}
+			where id = #{id}
+	</update>
+</mapper>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+
+<mapper namespace="superPms.dao.Notice_Dao">
+
+	<!-- 검색 데이터 가져오기, 페이징 처리 O -->
+	<select id="noticeList" parameterType="noticesch" resultType="notice">
+		select * from(
+			SELECT rownum cnt, noticeno,refno,
+				to_char(n.regdte,'yyyy-mm-dd') regdte, to_char(n.uptdte,'yyyy-mm-dd') uptdte,
+				title,content,viewcnt,writer,n.fno,n.deptid,fname,e.ename
+			FROM (SELECT * FROM notice ORDER BY UPTDTE DESC) n, files f, emp e
+			where n.fno=f.fno(+)
+			and n.writer = e.id
+			AND (n.deptid like '%'||#{deptid}||'%'
+			and title like '%'||#{schInfo}||'%')
+		)
+		where cnt between #{start} and #{end}
+	</select>
+	
+	<!-- 페이지 상세조회 -->
+	<select id="noticeDetail" parameterType="noticerepsch" resultType="notice">
+		SELECT rownum, 
+			noticeno,
+			refno,
+			to_char(n.regdte,'yyyy-mm-dd') regdte,
+			to_char(n.uptdte,'yyyy-mm-dd') uptdte,
+			title,
+			content,
+			viewcnt,
+			writer,
+			n.fno,
+			n.deptid,
+			fname,
+			path,
+			e.ename,
+			e.id
+		FROM (SELECT * FROM notice ORDER BY UPTDTE DESC) n, files f, emp e
+		where n.fno=f.fno(+)
+		and n.writer = e.id
+		and noticeno=#{noticeno}
+	</select>
+	
+	<!-- 공지사항 업데이트 처리 -->
+	<update id="uptNotice" parameterType="notice">
+		update notice
+		set
+			title=#{title},
+			content=#{content},
+			uptdte = sysdate,
+			deptid = #{deptid}
+		where noticeno=#{noticeno}
+	</update>
+	
+	<!-- 파일 업데이트 처리 -->
+	<update id="uptFile" parameterType="notice">
+		update files
+		set
+			fname=#{fname},
+			uptdte = sysdate,
+			path=#{path}
+		where fno=#{fno}
+	</update>
+	
+	<!-- 조회수 +1 처리 -->
+	<update id="plusCnt" parameterType="noticerepsch">
+		update notice
+		set
+			viewcnt = viewcnt+1
+		where noticeno=#{noticeno}
+	</update>
+	
+	<!-- 파일DB에 insert -> 공지사항 등록시, 파일이 있을 경우 파일 insert -->
+	<insert id="insertFile" parameterType="notice">
+		insert into files values(
+			files_seq.nextval,#{fname},sysdate,sysdate,#{path}
+		)
+	</insert>
+	
+	<!-- 공지사항 등록, 파일 유무 확인 -->
+	<insert id="insertNotice" parameterType="notice">
+		insert into notice values(
+			notice_seq.nextval,0,sysdate,sysdate,#{title},#{content},0,#{writer},
+			files_seq.currval,#{deptid}
+		)
+	</insert>
+	
+	<!-- 페이징 처리를 위한 전체 데이터 개수 가져오기 -->
+	<select id="totCnt" parameterType="noticesch" resultType="int">
+			select count(*)
+		      from notice
+		      where 1=1
+		      and deptid like '%'||#{deptid}||'%'
+		      and title like '%'||#{schInfo}||'%'
+	</select>
+	
+	<!-- 공지사항 삭제 -->
+	<delete id="delNotice" parameterType="int">
+		delete from notice
+		where noticeno=#{no}
+	</delete>
+	<!-- 공지사항 삭제시 그 공지사항에 있던 댓글 삭제 -->
+	<delete id="delNoticeRep" parameterType="int">
+		delete from noticerep
+		where noticeno=#{no}
+	</delete>
+	
+	<select id="filesCnt" parameterType="string" resultType="int">
+		SELECT count(*) FROM files
+		WHERE fname = #{fname}
+	</select>
+	
+	<!-- 파일 첨부된 공지사항의 경우 파일 삭제 -->
+	<delete id="delNoticeFile" parameterType="string">
+		delete from files
+		where fno=#{no}
+	</delete>
+	
+	<select id="schNoticeFile" parameterType="string" resultType="notice">
+		SELECT fname,path
+	 	FROM files f
+		WHERE fno = #{fno}
+	</select>
+	
+	<!-- 댓글 조회 -->
+	<select id="noticeRepList" parameterType="noticerepsch" resultType="noticerep">
+		SELECT * FROM (
+			SELECT rownum cnt, repno, refno, content, regdte, uptdte, noticeno, writer, ename FROM (
+				SELECT repno, refno, content, 
+							to_char(n.regdte,'yyyy-mm-dd') regdte,
+							to_char(n.uptdte,'yyyy-mm-dd') uptdte,
+							noticeno, writer, e.ename 
+				FROM noticerep n, emp e
+				WHERE noticeno=#{noticeno}
+				AND n.WRITER = e.id
+				ORDER BY n.regdte 
+				) r
+			)
+		WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 댓글 작성 -->
+	<insert id="insertNoticeRep" parameterType="noticerep">
+		insert into noticerep values(
+			noticeRep_seq.nextval,0,#{content},sysdate,sysdate,#{noticeno},#{writer}
+		)
+	</insert>
+	<!-- 댓글 삭제 -->
+	<delete id="deleteNoticeRep" parameterType="noticerep">
+		delete from noticerep
+		where repno=#{repno}
+	</delete>
+	<!-- 댓글 수정 -->
+	<update id="updateNoticeRep" parameterType="noticerep">
+		update noticerep
+		set
+			uptdte = sysdate,
+			content = #{content}
+		where repno=#{repno}
+	</update>
+	
+	<!-- 페이징 처리를 위한 댓글 전체 개수 가져오기 -->
+	<select id="totRepCnt" parameterType="noticerepsch" resultType="int">
+		select count(*)
+    		from noticerep
+    	where noticeno=#{noticeno}
+	</select>
+</mapper>

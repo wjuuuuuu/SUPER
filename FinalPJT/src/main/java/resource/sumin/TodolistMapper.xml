@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+
+<mapper namespace="superPms.dao.Todolist_Dao">
+
+	<insert id="insTodo" parameterType="todolist">
+		INSERT INTO todolist values(todo_seq.nextval,#{todo},'0',#{id},sysdate)
+	</insert>
+	
+	<select id="todoList" parameterType="string" resultType="todolist">
+		select * from todolist where id=#{id}
+	</select>
+	
+	<update id="uptcomStateTodo" parameterType="string">
+		UPDATE todolist SET state='1' WHERE tno=#{tno}
+	</update>
+	<update id="uptincomStateTodo" parameterType="string">
+		UPDATE todolist SET state='0' WHERE tno=#{tno}
+	</update>
+	
+	<delete id="delTodo" parameterType="string">
+		delete from todolist where tno=#{tno}
+	</delete>
+	
+	<update id="uptTodo" parameterType="todolist">
+		update todolist 
+			set todo=#{todo},
+				id=#{id} 
+		where tno=#{tno} 
+	</update>
+	
+	<select id="todoSchList" parameterType="todolist" resultType="todolist">
+		select * from todolist where todo LIKE '%'||#{todo}||'%' and id=#{id} ORDER BY REGDTE desc
+	</select>
+</mapper>

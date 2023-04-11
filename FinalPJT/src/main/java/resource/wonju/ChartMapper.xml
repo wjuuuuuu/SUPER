@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+
+<mapper namespace="superPms.dao.Chart_Dao">
+	<select id="getBar" parameterType="bar" resultType="bar">
+	SELECT DISTINCT a.avgs,p.subject, substr(p.deadline,6,5) AS deadline
+	FROM (SELECT ROUND(Avg(PROGRESS)*100,1) AS avgs ,prjno FROM gantt GROUP BY prjno) a, 
+	project p
+	WHERE a.prjno=p.prjno AND TO_NUMBER(substr(p.DEADLINE,0,4))=#{year} 
+	AND TO_NUMBER(SUBSTR(p.deadline,6,2))=#{month}
+	ORDER BY deadline desc
+	</select>
+	
+	<select id="getDonut" resultType="donut">
+	SELECT ppp.*, d.dname FROM (SELECT count(*) AS cnts, pp.deptid 
+	FROM (SELECT * FROM PROJECT p WHERE p.deadline>=
+	to_char(sysdate,'yyyy-mm-dd')) pp GROUP BY pp.deptid) ppp, dept d
+	WHERE ppp.deptid=d.deptid
+	</select>
+
+	<select id="rateByMember" parameterType="int" resultType="bar">
+	SELECT owner, round(avg(PROGRESS)*100,1) AS avgs FROM gantt 
+	WHERE prjno=#{prjno} GROUP BY owner ORDER BY avgs DESC
+	</select>
+	<select id="totRate" parameterType="int" resultType="bar">
+	SELECT round(avg(progress)*100,0) AS avgs FROM gantt WHERE prjno=#{prjno}
+	</select>
+	
+	<select id="infoByMonth" parameterType="int" resultType="bar">
+	SELECT d.MONTH,p.tot,p.cnt FROM (SELECT TO_NUMBER(substr(deadline,6,2)) AS months ,sum(amount) AS tot,count(prjno) AS cnt 
+	FROM PROJECT WHERE TO_NUMBER(substr(deadline,0,4))=#{year}
+	GROUP BY TO_NUMBER(substr(deadline,6,2))) p, (SELECT ROWNUM month FROM DUAL CONNECT BY 12>=LEVEL) d
+	WHERE d.month =p.months(+) ORDER BY d.month
+	</select>
+	
+	<select id="totAmount" parameterType="int" resultType="bar">
+	SELECT sum(amount) AS tot FROM PROJECT WHERE TO_NUMBER(substr(deadline,0,4))=#{year}
+	</select>
+	
+	<select id="infoPm" resultType="bar">
+	SELECT 'totPM' AS subject, count(*) AS cnt FROM emp WHERE AUTH = 2
+	UNION ALL
+	SELECT 'proPM' AS subject, count(DISTINCT tlid) AS cnt FROM PROJECT p WHERE p.DEADLINE >= TO_CHAR(sysdate,'yyyy-mm-dd')
+	</select>
+	
+	<select id="infoEmp" resultType="bar">
+	SELECT 'totEmp' AS subject, count(id) AS cnt FROM emp e, dept d 
+	WHERE NOT e.AUTH IN 2 and d.DEPTID =e.DEPTID AND d.DNAME LIKE '%'||'개발'||'%'
+	UNION ALL 
+	SELECT 'proEmp' AS subject, count(DISTINCT id) AS cnt FROM emp e, dept d, PROJECT p, PROJECTMEMBER m 
+	WHERE NOT e.AUTH IN 2 and d.DEPTID =e.DEPTID AND d.DNAME LIKE '%'||'개발'||'%'
+	AND p.PRJNO =m.PRJNO AND m.OWNER =e.ID AND p.DEADLINE >=TO_CHAR(sysdate,'yyyy-mm-dd')
+	</select>
+	
+	<select id="infoRisk" resultType="bar">
+	SELECT count(*) AS cnt FROM risk WHERE RISKSTATE!='해결' GROUP BY RISKPRIORITY ORDER BY RISKPRIORITY
+	</select>
+</mapper>
