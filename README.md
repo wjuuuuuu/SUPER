@@ -1,7 +1,7 @@
 # SUPER PMS
 
 ### 1. ERD
-![1](https://user-images.githubusercontent.com/101163070/232696667-f605b4ed-e14a-428e-a2f5-f1b28c2a114d.png)
+![image](https://user-images.githubusercontent.com/101163070/232703439-9f3fe36a-4f69-481e-b671-69a0304b41e7.png)
 
 ### 2. Flow Chart
 
